@@ -27,13 +27,15 @@ func main() {
 	}
 	dstfiles, err := getFileList(*destination)
 	if err != nil {
-		log.Println("Error getting source file list: " + err.Error())
+		log.Println("Error getting destination file list: " + err.Error())
 	}
 
 	missing(srcfiles, dstfiles)
 
 }
 
+// getFileList takes a ssrcpath and returns a slice
+// of strings of every file & folder within that path
 func getFileList(srcpath string) ([]string, error) {
 
 	var filelist []string
@@ -43,6 +45,7 @@ func getFileList(srcpath string) ([]string, error) {
 			if err != nil {
 				return err
 			}
+			// remove the srcpath to rerun just a relative location
 			filelist = append(filelist, strings.Replace(path, srcpath, "", -1))
 			return nil
 		})
@@ -51,16 +54,25 @@ func getFileList(srcpath string) ([]string, error) {
 
 }
 
-// stolen from stack overflow
-func missing(a, b []string) {
-	mb := make(map[string]bool, len(a))
+// find missing strings from a source slice in a
+// destination slice and print them out
+func missing(src []string, dest []string) {
 
-	for _, kb := range b {
-		mb[kb] = true
+	// create a map to hold the destination strings
+	// string as key (the strings), then bool to
+	// be able to use logic operator
+	destmap := make(map[string]bool, len(dest))
+
+	for _, kdest := range dest {
+		// add the destination strings to the map
+		// setting them all as true
+		destmap[kdest] = true
 	}
-	for _, ka := range a {
-		if !mb[ka] {
-			fmt.Println(ka)
+	for _, ksrc := range src {
+		// check if src strings exist
+		// if key not found then bool is false
+		if !destmap[ksrc] {
+			fmt.Println(ksrc)
 		}
 	}
 	return
